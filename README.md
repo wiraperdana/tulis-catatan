@@ -50,6 +50,7 @@ Tanpa opsi, kedua skill dipasang ke semua lokasi yang relevan:
 | `--agents` | `~/.agents/skills` | Codex dan harness lain yang membaca lokasi universal Agent Skills |
 | `--project` | `.claude/skills` dan `.agents/skills` di folder kerja | Satu project saja |
 | `--dest <folder>` | Folder pilihan sendiri | Harness dengan lokasi skill lain |
+| `--link` | Ditambahkan ke opsi mana pun | Pasang sebagai symlink ke repo ini, jadi `git pull` langsung berlaku tanpa install ulang |
 
 ### Memanggil di tiap harness
 
