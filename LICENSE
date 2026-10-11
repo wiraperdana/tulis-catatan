@@ -19,13 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
----
-
-Catatan tentang teks regulasi yang disertakan:
-
-Berkas di sources/ dan references/ memuat teks Peraturan Menteri Keuangan
-Nomor 32 Tahun 2025 dan Peraturan Rektor Universitas Indonesia Nomor 16
-Tahun 2024. Keduanya dokumen resmi, disertakan apa adanya untuk keperluan
-rujukan. Lisensi MIT di atas berlaku untuk kerangka skill, indeks, dan
-perkakas di repo ini, bukan untuk teks regulasinya.
