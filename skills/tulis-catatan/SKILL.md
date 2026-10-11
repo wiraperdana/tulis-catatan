@@ -39,8 +39,21 @@ Opsi default:
 | Opsi | Default |
 |---|---|
 | `--lang` | `id`: Bahasa Indonesia, istilah teknis tetap dalam bentuk Inggrisnya |
-| `--out` | Folder yang sama dengan file transkrip |
+| `--out` | Ditentukan otomatis oleh `scripts/lokasi_output.py`, lihat di bawah |
 | `--mindmap` | Tidak dibuat |
+
+**Folder output.** Bila `--out` tidak diberikan, jalankan:
+
+```bash
+python3 scripts/lokasi_output.py <transkrip>
+```
+
+Baris pertama keluarannya adalah folder output, baris kedua alasannya. Aturannya:
+
+1. Transkrip di dalam workspace **Personal-OS** (ada `AGENTS.md` berfrontmatter `schema: personal-os/agents@1` di folder atasnya): tulis ke `_output/` milik Project terdekat, atau milik Entity terdekat bila tidak ada Project.
+2. Di luar itu: tulis di folder yang sama dengan transkrip.
+
+Sampaikan folder dan alasannya ke pengguna sebelum menulis, supaya ia bisa mengoreksi dengan `--out`. Buat folder `_output/` bila belum ada.
 
 ### 1. Rapikan transkrip
 
@@ -75,7 +88,7 @@ Istilah yang tidak bisa dipastikan ditulis apa adanya dengan tanda `[tidak jelas
 ### 4. Tulis catatan bagian per bagian
 
 1. Baca template mode di `templates/<mode>.md`.
-2. Tulis file `catatan_<nama-transkrip>.md` di folder `--out`, berisi judul dan semua heading bagian dengan isi `(sedang ditulis)`.
+2. Tulis file `catatan_<nama-transkrip>.md` di folder output, berisi judul dan semua heading bagian dengan isi `(sedang ditulis)`.
 3. Isi tiap bagian satu per satu dengan Edit. Jangan menulis seluruh catatan dalam satu panggilan Write, karena catatan sesi dua jam bisa melampaui batas satu jawaban dan terpotong di tengah.
 4. Transkrip di atas sekitar dua jam diproses per topik. Selesaikan satu topik di bagian penjelasan sebelum membaca topik berikutnya.
 
@@ -103,7 +116,7 @@ Bila keluar dengan kode 2, KaTeX belum terpasang. Pasang sekali dengan perintah 
 2. Simpan outline di folder kerja sementara, lalu jalankan:
 
 ```bash
-python3 scripts/mindmap_xmind.py buat <outline.json> -o <folder-out>/mindmap_<nama-transkrip>.xmind
+python3 scripts/mindmap_xmind.py buat <outline.json> -o <folder-output>/mindmap_<nama-transkrip>.xmind
 ```
 
 3. Bila skrip melaporkan error, rapikan outline lalu jalankan ulang. Jangan memakai `--paksa` kecuali pengguna memintanya.

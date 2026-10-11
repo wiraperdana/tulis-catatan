@@ -59,9 +59,15 @@ Kebutuhan:
 | `[lampiran ...]` | Slide (`.pdf`, `.pptx`), handout, catatan sendiri, foto papan tulis, atau URL |
 | `--mindmap` | Buat juga `mindmap_<nama>.xmind` |
 | `--lang` | `id` (default): Bahasa Indonesia dengan istilah teknis Inggris. `en`: Bahasa Inggris |
-| `--out` | Folder output. Default: folder yang sama dengan transkrip |
+| `--out` | Folder output. Default: lihat "Lokasi output" di bawah |
 
 Bila mode tidak disebut, skill menebak dari isi transkrip lalu meminta konfirmasi.
+
+### Lokasi output
+
+Tanpa `--out`, catatan ditulis di folder yang sama dengan transkrip.
+
+Pengecualiannya untuk workspace **Personal-OS**, yaitu folder yang punya `AGENTS.md` berfrontmatter `schema: personal-os/agents@1`. Di sana catatan masuk ke `_output/` milik Project terdekat, atau milik Entity terdekat bila tidak ada Project. Skill selalu menyebut folder tujuannya sebelum menulis.
 
 ## Notasi matematika
 
@@ -96,7 +102,8 @@ skills/tulis-catatan/
 └── scripts/
     ├── rapikan_transkrip.py     vtt, srt, txt, docx jadi transkrip ringkas
     ├── cek_latex.mjs            validasi rumus dengan KaTeX
-    └── mindmap_xmind.py         cek bentuk outline dan tulis .xmind
+    ├── mindmap_xmind.py         cek bentuk outline dan tulis .xmind
+    └── lokasi_output.py         tentukan folder output
 zoom/instruction_lecture-note_zoom.md
 install.sh
 ```
