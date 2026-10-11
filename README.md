@@ -1,9 +1,15 @@
-# tulis-catatan
+# tulis-catatan dan buat-mindmap
 
-Skill untuk Claude Code yang mengubah transkrip rekaman jadi catatan Markdown yang lengkap, bersumber, dan bertimestamp. Ia bisa menerima slide atau materi sebagai lampiran, memvalidasi notasi matematika, dan menghasilkan mindmap `.xmind` yang tetap terbaca saat dicetak di kertas A4.
+Dua skill agent untuk Claude Code, Codex, dan harness lain yang mengikuti standar Agent Skills.
+
+| Skill | Mengubah | Menjadi |
+|---|---|---|
+| `tulis-catatan` | Transkrip rekaman, plus slide atau materi sebagai lampiran | Catatan Markdown yang lengkap, bersumber, dan bertimestamp, dengan rumus tervalidasi. Opsional: mindmap `.xmind` |
+| `buat-mindmap` | Dokumen apa pun yang isinya bisa dibaca: Markdown, DOCX, PPTX, PDF, XLSX, HTML, foto | Mindmap `.xmind` yang tetap terbaca saat semua cabang dibuka dan dicetak di A4 |
 
 ```
 /tulis-catatan kuliah rekaman.vtt slide-minggu6.pdf --mindmap
+/buat-mindmap slide-minggu6.pptx catatan-saya.md
 ```
 
 ## Kenapa ini ada
@@ -32,22 +38,42 @@ Setiap mode punya template di `skills/tulis-catatan/templates/`. Menambah mode c
 ```bash
 git clone https://github.com/wiraperdana/tulis-catatan.git
 cd tulis-catatan
-./install.sh              # pasang global, ke ~/.claude/skills
-./install.sh --project    # atau pasang ke .claude/skills di project saat ini
+./install.sh
 ```
+
+Tanpa opsi, kedua skill dipasang ke semua lokasi yang relevan:
+
+| Opsi | Lokasi | Untuk |
+|---|---|---|
+| (tanpa opsi) | `~/.claude/skills` bila ada, dan `~/.agents/skills` | Semua harness yang terdeteksi |
+| `--claude` | `~/.claude/skills` | Claude Code |
+| `--agents` | `~/.agents/skills` | Codex dan harness lain yang membaca lokasi universal Agent Skills |
+| `--project` | `.claude/skills` dan `.agents/skills` di folder kerja | Satu project saja |
+| `--dest <folder>` | Folder pilihan sendiri | Harness dengan lokasi skill lain |
+
+### Memanggil di tiap harness
+
+| Harness | Cara memanggil |
+|---|---|
+| Claude Code | Ketik `/tulis-catatan` atau `/buat-mindmap` |
+| Codex | Sebut nama skill-nya, misalnya "pakai skill buat-mindmap untuk slide.pptx" |
+| Harness lain | Sama seperti Codex. Bila harness tidak menemukan skill otomatis, minta ia membaca `SKILL.md` di folder skill lalu menjalankannya |
+
+Skill ini hanya berisi instruksi Markdown dan skrip Python atau Node. Tidak ada yang bergantung pada tool khusus satu harness. Format yang tidak bisa dibaca harness diekstrak lewat `ekstrak_teks.py`.
 
 Kebutuhan:
 
 | Komponen | Untuk | Wajib? |
 |---|---|---|
-| Python 3.9+ | Merapikan transkrip dan membuat mindmap | Ya |
+| Python 3.9+ | Merapikan transkrip, ekstraksi dokumen, dan membuat mindmap | Ya |
 | Node.js dan npm | Validasi rumus dengan KaTeX | Hanya bila catatan memuat matematika |
 | MCP Quran dan Hadits | Verifikasi dalil di mode `kajian` | Tidak. Tanpanya, dalil diberi tanda `[belum terverifikasi]` |
-| Xmind | Membuka mindmap | Hanya bila memakai `--mindmap` |
+| `pdftotext` (poppler) atau `pypdf` | Ekstraksi PDF | Hanya bila harness tidak bisa membaca PDF sendiri |
+| Xmind | Membuka mindmap | Hanya untuk mindmap |
 
 `install.sh` juga memasang KaTeX ke `~/.cache/tulis-catatan` bila npm tersedia.
 
-## Pemakaian
+## Pemakaian `tulis-catatan`
 
 ```
 /tulis-catatan <mode> <file-transkrip> [lampiran ...] [--mindmap] [--lang id|en] [--out <folder>]
@@ -69,6 +95,21 @@ Tanpa `--out`, catatan ditulis di folder yang sama dengan transkrip.
 
 Pengecualiannya untuk workspace **Personal-OS**, yaitu folder yang punya `AGENTS.md` berfrontmatter `schema: personal-os/agents@1`. Di sana catatan masuk ke `_output/` milik Project terdekat, atau milik Entity terdekat bila tidak ada Project. Skill selalu menyebut folder tujuannya sebelum menulis.
 
+## Pemakaian `buat-mindmap`
+
+```
+/buat-mindmap <file> [file lain ...] [--judul "<judul>"] [--fokus "<bagian>"] [--lang id|en] [--out <folder>]
+```
+
+| Argumen | Keterangan |
+|---|---|
+| `<file>` | `.md`, `.txt`, `.docx`, `.pptx`, `.xlsx`, `.pdf`, `.html`, `.odt`, `.odp`, gambar, atau URL. Beberapa file digabung jadi satu mindmap |
+| `--judul` | Teks node pusat. Default: judul dokumen pertama |
+| `--fokus` | Batasi ke satu bab, topik, atau rentang slide. Berguna untuk dokumen tebal yang tidak muat dalam 70 node |
+| `--lang`, `--out` | Sama seperti `tulis-catatan` |
+
+Skill menyusun struktur dari isi dokumen, memakai istilah dokumen apa adanya, lalu melaporkan bagian yang tidak masuk karena batas node dan isi yang tidak terbaca, misalnya slide yang hanya berisi gambar.
+
 ## Notasi matematika
 
 Rumus ditulis dengan `$...$` dan `$$...$$`, lalu setiap rumus di-render dengan [KaTeX](https://katex.org) untuk memastikan tidak ada yang rusak. Skrip validasi juga menolak simbol Unicode di dalam rumus dan pembatas `\(` atau `\[`, karena keduanya sering tampil rusak di editor Markdown. Catatan bisa dibaca di Obsidian, VS Code, Typora, atau GitHub.
@@ -87,9 +128,9 @@ Mindmap yang semua cabangnya dibuka harus tetap terbaca di satu lembar A4 landsc
 | Total node | Maksimal 70 |
 | Panjang label | 5 kata di level 1 dan 2, 10 kata di level 3 dan 4 |
 
-Batas ini titik awal dan belum dikalibrasi dengan cetak uji. Bila hasil cetak Anda terlalu padat atau terlalu longgar, ubah konstanta di bagian atas `mindmap_xmind.py`.
+Batas ini titik awal dan belum dikalibrasi dengan cetak uji. Bila hasil cetak Anda terlalu padat atau terlalu longgar, ubah konstanta di bagian atas `skills/tulis-catatan/scripts/mindmap_xmind.py`, lalu jalankan `tools/sinkron_skrip.sh`.
 
-## Tanpa Claude Code: template Zoom Notes
+## Tanpa agent: template Zoom Notes
 
 Folder `zoom/` berisi template instruksi untuk fitur catatan AI di Zoom. Template itu dirancang supaya selesai sampai bagian terakhir walaupun panjang output Zoom dibatasi: setiap bagian diberi batas kata sendiri, dan totalnya sekitar 2.300 kata.
 
@@ -102,11 +143,18 @@ skills/tulis-catatan/
 └── scripts/
     ├── rapikan_transkrip.py     vtt, srt, txt, docx jadi transkrip ringkas
     ├── cek_latex.mjs            validasi rumus dengan KaTeX
-    ├── mindmap_xmind.py         cek bentuk outline dan tulis .xmind
-    └── lokasi_output.py         tentukan folder output
+    ├── mindmap_xmind.py         cek bentuk outline dan tulis .xmind   (bersama)
+    ├── lokasi_output.py         tentukan folder output                (bersama)
+    └── ekstrak_teks.py          docx, pptx, xlsx, pdf jadi teks       (bersama)
+skills/buat-mindmap/
+├── SKILL.md
+└── scripts/                     salinan tiga skrip bersama
+tools/sinkron_skrip.sh           salin dan periksa skrip bersama
 zoom/instruction_lecture-note_zoom.md
 install.sh
 ```
+
+Setiap skill membawa salinan skrip bersamanya sendiri, supaya tetap jalan bila dipasang terpisah. Sumber kebenarannya `skills/tulis-catatan/scripts/`. Setelah mengubah skrip bersama, jalankan `tools/sinkron_skrip.sh`. `install.sh` menolak berjalan bila salinannya berbeda.
 
 ## Lisensi
 
