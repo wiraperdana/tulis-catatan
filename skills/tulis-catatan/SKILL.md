@@ -12,7 +12,7 @@ Prinsip utamanya satu: **pembaca harus selalu tahu dari mana setiap kalimat bera
 ## Pemanggilan
 
 ```
-tulis-catatan <mode> <file-transkrip> [lampiran ...] [--mindmap] [--lang id|en] [--out <folder>]
+tulis-catatan <mode> <file-transkrip> [lampiran ...] [--mindmap] [--isi penjelasan|ringkasan] [--alur kronologi|konsep] [--lang id|en] [--out <folder>]
 ```
 
 Di Claude Code, ketik `/tulis-catatan`. Di harness lain seperti Codex, sebut nama skill-nya dalam kalimat, misalnya "pakai skill tulis-catatan, mode kuliah, untuk rekaman.vtt dan slide.pdf".
@@ -43,6 +43,10 @@ Opsi default:
 | `--lang` | `id`: Bahasa Indonesia, istilah teknis tetap dalam bentuk Inggrisnya |
 | `--out` | Ditentukan otomatis oleh `scripts/lokasi_output.py`, lihat di bawah |
 | `--mindmap` | Tidak dibuat |
+| `--isi` | `penjelasan`. Hanya berlaku bila `--mindmap` |
+| `--alur` | `kronologi`. Hanya berlaku bila `--mindmap` |
+
+**Bila `--mindmap` diminta, jelaskan dulu kedua opsi bentuk mindmap** dengan tabel di bagian "Aturan mindmap", lalu satu baris `Dipakai: --isi <nilai> --alur <nilai>`. Bila pengguna tidak menyebut opsi, pakai default lalu lanjutkan. Untuk mode `mom`, `klien`, dan `brainstorming`, sebutkan bahwa `--isi ringkasan` biasanya lebih cocok.
 
 **Folder output.** Bila `--out` tidak diberikan, jalankan:
 
@@ -136,7 +140,7 @@ Bila keluar dengan kode 2, KaTeX belum terpasang. Pasang sekali dengan perintah 
 2. Simpan outline di folder kerja sementara, lalu jalankan:
 
 ```bash
-python3 scripts/mindmap_xmind.py buat <outline.json> -o <folder-output>/mindmap_<nama-transkrip>.xmind
+python3 scripts/mindmap_xmind.py buat <outline.json> --isi <isi> --alur <alur> -o <folder-output>/mindmap_<nama-transkrip>.xmind
 ```
 
 3. Bila skrip melaporkan error, rapikan outline lalu jalankan ulang. Jangan memakai `--paksa` kecuali pengguna memintanya.
@@ -201,6 +205,21 @@ Target render adalah editor Markdown yang memakai KaTeX atau MathJax, misalnya O
 
 ## Aturan mindmap
 
+Dua opsi menentukan bentuk mindmap:
+
+| Opsi | Nilai | Artinya | Cocok untuk |
+|---|---|---|---|
+| `--isi` | `penjelasan` (default) | Tiap konsep dipecah jadi elemen penjelasan yang dipilih sesuai konsepnya: Definisi, Tujuan, Urutan, Langkah, Contoh, Hubungan, dan lainnya | Bahan belajar, persiapan ujian |
+| | `ringkasan` | Label pendek dari sumber, tanpa elemen penjelasan | Ikhtisar cepat, notulen |
+| `--alur` | `kronologi` (default) | Mengikuti urutan penjelasan di sumber: bagian slide atau bab, lalu konsep sesuai urutan kemunculan. Cabang dan konsep diberi nomor urut | Belajar ulang berdampingan dengan slide atau rekaman |
+| | `konsep` | Dikelompokkan menurut topik, tanpa nomor. Konsep yang dibahas di beberapa tempat disatukan | Revisi cepat, mencari konsep saat ujian |
+
+Kedua opsi bebas dikombinasikan, jadi ada empat bentuk. Alur kronologi dan alur konsep dari sumber yang sama dibuat sebagai **dua berkas terpisah**, karena satu pohon hanya bisa punya satu hierarki.
+
+Pada transkrip, `--alur kronologi` berarti mengikuti jalannya sesi. Isi field `sumber` setiap bagian dan konsep dengan timestamp awalnya, misalnya `"sumber": "00:12:30"`. Skrip memberi nomor urut, menolak timestamp yang mundur, dan menulis timestamp ke catatan Xmind.
+
+Pada `--isi penjelasan`, konsep ditulis sebagai objek, misalnya `{"concept": "Gini index", "sumber": "00:41:05", "definisi": "...", "langkah": "..."}`. Elemen yang dikenal: `definisi`, `jenis`, `tujuan`, `kapan`, `asumsi`, `urutan` (tahapan tanpa hitungan), `langkah` (langkah matematis), `contoh`, `interpretasi`, `pembeda`, `hubungan` (kaitan dengan bagian lain sesi), `plusminus`, `jebakan`, `catatan`. Semuanya opsional; pilih 2 sampai 5 yang logis untuk konsepnya. Tabel pemilihan per jenis konsep ada di skill `buat-mindmap` bagian 4b.
+
 Mindmap yang semua cabangnya dibuka harus tetap terbaca saat dicetak di satu lembar A4 landscape. Kalau hanya ada cabang utama, mindmap itu tidak berguna. Kalau setiap detail ikut digambar, hurufnya mengecil sampai tidak terbaca. Skrip `mindmap_xmind.py` menegakkan aturan ini:
 
 | Aturan | Nilai |
@@ -231,4 +250,4 @@ Panduan isi:
 2. **Level 1** mengikuti pembagian terbesar catatan, misalnya topik di Peta Kuliah atau agenda rapat.
 3. **Level 2** berisi konsep atau poin di dalam topik itu.
 4. **Level 3** berisi detail yang paling perlu diingat: definisi singkat, contoh, atau keputusan.
-5. Tulis label sebagai frasa padat, bukan kalimat. Tanpa nomor slide dan timestamp, karena keduanya ada di catatan.
+5. Tulis label sebagai frasa padat, bukan kalimat. Tanpa nomor slide dan timestamp di label; keduanya masuk field `sumber`.
