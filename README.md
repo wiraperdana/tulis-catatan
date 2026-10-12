@@ -36,8 +36,8 @@ Setiap mode punya template di `skills/tulis-catatan/templates/`. Menambah mode c
 ## Pemasangan
 
 ```bash
-git clone https://github.com/wiraperdana/tulis-catatan.git
-cd tulis-catatan
+git clone https://github.com/wiraperdana/tulis-catatan-skills.git
+cd tulis-catatan-skills
 ./install.sh
 ```
 
